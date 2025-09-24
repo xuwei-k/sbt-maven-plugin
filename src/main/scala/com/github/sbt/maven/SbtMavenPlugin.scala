@@ -40,7 +40,8 @@ object SbtMavenPlugin extends AutoPlugin {
     val mavenVersion            = settingKey[String]("Maven version")
     val mavenPluginToolsVersion = settingKey[String]("Maven Plugin Tools version")
 
-    val MavenConf       = Configurations.config("scripted-maven").hide
+    val MavenConf = Configurations.config("scripted-maven").hide
+    @transient
     val mavenClasspath  = taskKey[PathFinder]("")
     val mavenLaunchOpts =
       settingKey[Seq[String]]("options to pass to jvm launching Maven tasks")
@@ -66,7 +67,7 @@ object SbtMavenPlugin extends AutoPlugin {
   private def scriptedMavenSettings: Seq[Setting[?]] = Seq(
     ivyConfigurations += MavenConf,
     mavenClasspath := Def.task {
-      PathFinder(Classpaths.managedJars(MavenConf, classpathTypes.value, Keys.update.value).map(_.data))
+      PathFinder(SbtMavenPluginCompat.managedJars(MavenConf, classpathTypes.value, Keys.update.value))
     }.value,
     scripted / sourceDirectory := sourceDirectory.value / "maven-test",
     scripted                   := scriptedTask.evaluated,

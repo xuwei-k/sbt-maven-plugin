@@ -50,12 +50,32 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
   s
 }
 
+crossScalaVersions += "3.7.3"
+
+scalacOptions --= {
+  scalaBinaryVersion.value match {
+    case "3" =>
+      Seq("-Xfatal-warnings")
+    case _ =>
+      Nil
+  }
+}
+
+pluginCrossBuild / sbtVersion := {
+  scalaBinaryVersion.value match {
+    case "2.12" =>
+      sbtVersion.value
+    case _ =>
+      "2.0.0-RC5"
+  }
+}
+
 addCommandAlias(
   "validateCode",
   List(
     "scalafmtSbtCheck",
-    "scalafmtCheckAll",
-    "javafmtCheckAll",
-    "headerCheck"
+    "+ scalafmtCheckAll",
+    "+ javafmtCheckAll",
+    "+ headerCheckAll"
   ).mkString(";")
 )
